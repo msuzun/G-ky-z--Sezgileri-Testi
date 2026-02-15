@@ -1,7 +1,30 @@
-<!-- Butonun içindeki emojiye event.target.textContent aracılığıyla erişebilirsiniz. likedEmojis state array'ini güncellemek için, emojiyi mevcut state'in bir kopyasının sonuna yapıştırmanız yeterlidir.
+# Emoji / Sky Test
 
-currentEmojis state'i aracılığıyla mevcut emojilerin üçüne de erişebilirsiniz.
+## Acceptance Checklist
+- [ ] Aynı emoji seçimi tekrarlandığında aynı profil ve aynı metin varyasyonu çıkıyor.
+- [ ] Farklı emoji seçimleri farklı profillere dağılabiliyor.
+- [ ] `emojiPersonalityTheme` ile eski sonuç motoru davranışı bozulmadan çalışıyor.
+- [ ] Mobil görünümde (360x800 ve 390x844) taşma/kırılma yok.
 
-Bu iki bilgi parçasından, kullanıcının *seçmediği* iki emojiyi de belirleyebilirsiniz.
+## Automated Tests
+Çalıştır:
 
-Daha sonra state'i güncellemek için bunları geçerli passedEmojis state array'inin bir kopyasının sonuna yapıştırmanız yeterlidir.  -->
+```bash
+node --test src/lib/computeResult.test.js
+```
+
+Kapsam:
+- Deterministic sonuç (aynı seçim -> aynı profil)
+- Farklı seçimlerde farklı profiller (sky theme üzerinden)
+- Eski tema uyumluluğu (`emojiPersonalityTheme`)
+- Tie-break davranışı
+- Geçersiz kural güvenliği
+
+## Manual Mobile Check
+1. `npm run dev` ile projeyi aç.
+2. Tarayıcı devtools cihaz modunda `360x800` ve `390x844` seç.
+3. Şunları doğrula:
+   - Üst başlık ve sayaç görünür.
+   - Emoji butonları ekrandan taşmıyor.
+   - Sonuç modalı tam görünür, buton erişilebilir.
+   - Liste alanında yatay kaydırma oluşmuyor.

@@ -1,100 +1,139 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useReducer } from 'react'
 import ResultsModal from './components/ResultsModal'
-import EmojiLists from './components/EmojiLists'
-import emojis from './data/emojis'
+import EmojiListPanel from './components/EmojiListPanel'
+import EmojiPicker from './components/EmojiPicker'
+import ProgressHeader from './components/ProgressHeader'
 import computeResult from './lib/computeResult'
-import emojiPersonalityTheme from './themes/emojiPersonalityTheme'
+import skyTheme from './themes/skyTheme'
+import { GAME_CONFIG } from './config/gameConfig'
 import './styles.css'
 
-export default function App() {
-  const [likedEmojis, setLikedEmojis] = useState([])
-  const [passedEmojis, setPassedEmojis] = useState([])
-  const [currentEmojis, setCurrentEmojis] = useState(getRandomEmojis())
-  const [showResults, setShowResults] = useState(false)
-  const [resultsReady, setResultsReady] = useState(false)
-  const [hydrated, setHydrated] = useState(false)
+const activeTheme = skyTheme
 
-  function handleClick() {
-    const clickedEmoji = event.target.textContent;
-    const newLikedEmojis = [...likedEmojis, clickedEmoji];
-    const newPassedEmojis = currentEmojis.filter(emoji => emoji !== clickedEmoji);
-  
-    setLikedEmojis(newLikedEmojis);
-    setPassedEmojis([...passedEmojis, ...newPassedEmojis]);
-    setCurrentEmojis(getRandomEmojis());
+function generateEmojiBatch(pool, batchSize) {
+  function pickRandomEmoji() {
+    return pool[Math.floor(Math.random() * pool.length)]
   }
-  function getRandomEmojis() {
-    function chooseRandomEmoji() {
-      return emojis[Math.floor(Math.random() * emojis.length)]
+
+  return new Array(batchSize).fill('').map(() => pickRandomEmoji())
+}
+
+function createInitialState(theme) {
+  return {
+    likedEmojis: [],
+    passedEmojis: [],
+    currentEmojis: generateEmojiBatch(theme.emojiPool, GAME_CONFIG.emojiBatchSize),
+    isResultsVisible: false,
+    areResultsReady: false,
+    isHydrated: false
+  }
+}
+
+function gameReducer(state, action) {
+  switch (action.type) {
+    case 'PICK_EMOJI': {
+      const clickedEmoji = action.payload
+      const newLikedEmojis = [...state.likedEmojis, clickedEmoji]
+      const newPassedEmojis = state.currentEmojis.filter((emoji) => emoji !== clickedEmoji)
+
+      return {
+        ...state,
+        likedEmojis: newLikedEmojis,
+        passedEmojis: [...state.passedEmojis, ...newPassedEmojis],
+        currentEmojis: generateEmojiBatch(activeTheme.emojiPool, GAME_CONFIG.emojiBatchSize)
+      }
     }
-    return new Array(3).fill('').map((item) => chooseRandomEmoji())
+    case 'SHOW_RESULTS':
+      return {
+        ...state,
+        isResultsVisible: true
+      }
+    case 'SET_RESULTS_READY':
+      return {
+        ...state,
+        areResultsReady: true
+      }
+    case 'RESET_GAME':
+      return {
+        ...createInitialState(activeTheme),
+        isHydrated: state.isHydrated
+      }
+    case 'SET_HYDRATED':
+      return {
+        ...state,
+        isHydrated: true
+      }
+    default:
+      return state
   }
+}
 
-  function getResults() {
-    setShowResults(true)
-  }
-
-  function reset() {
-    setLikedEmojis([])
-    setPassedEmojis([])
-    setShowResults(false)
-    setResultsReady(false)
-  }
+export default function App() {
+  const [state, dispatch] = useReducer(gameReducer, activeTheme, createInitialState)
 
   useEffect(() => {
-    showResults &&
-      setTimeout(() => {
-        setResultsReady(true)
-      }, 2000)
-  }, [showResults])
+    if (!state.isResultsVisible) {
+      return undefined
+    }
 
-  function generateListItems(element) {
-    return <li key={crypto.randomUUID()}>{element}</li>
-  }
+    const timerId = setTimeout(() => {
+      dispatch({ type: 'SET_RESULTS_READY' })
+    }, GAME_CONFIG.resultDelayMs)
 
-  const computedResult = useMemo(
-    () => computeResult(likedEmojis, emojiPersonalityTheme),
-    [likedEmojis]
-  )
+    return () => clearTimeout(timerId)
+  }, [state.isResultsVisible])
 
   useEffect(() => {
-    // Emojilerin yüklenmesi
-    setHydrated(true)
+    dispatch({ type: 'SET_HYDRATED' })
   }, [])
 
-  return (
-    <div className='wrapper'>
-      <div className='results-counter'>{likedEmojis.length} / 10</div>
+  const computedResult = useMemo(
+    () => computeResult(state.likedEmojis, activeTheme),
+    [state.likedEmojis]
+  )
 
-      <ResultsModal
-        showResults={showResults}
-        getResults={getResults}
-        resultsReady={resultsReady}
-        reset={reset}
-        generateListItems={generateListItems}
-        likedEmojis={likedEmojis}
-        computedResult={computedResult}
+  function renderEmojiListItem(element, index) {
+    return <li key={`${element}-${index}`}>{element}</li>
+  }
+
+  return (
+    <div className='wrapper theme-sky'>
+      <div className='sky-particles-placeholder' aria-hidden='true' />
+
+      <ProgressHeader
+        title={activeTheme.uiText.title}
+        subtitle={activeTheme.uiText.subtitle}
+        progress={state.likedEmojis.length}
+        total={GAME_CONFIG.maxSelection}
       />
 
-      <h1>Emoji Kişilik Testi</h1>
+      <ResultsModal
+        likedEmojis={state.likedEmojis}
+        maxSelection={GAME_CONFIG.maxSelection}
+        showResults={state.isResultsVisible}
+        resultsReady={state.areResultsReady}
+        computedResult={computedResult}
+        uiText={activeTheme.uiText}
+        onShowResults={() => dispatch({ type: 'SHOW_RESULTS' })}
+        onReset={() => dispatch({ type: 'RESET_GAME' })}
+      />
 
-      {hydrated ? ( // hydrated true olduğunda içeriği göster
+      {state.isHydrated ? (
         <>
-          <div className='overall-emojis-container'>
-            <button onClick={handleClick}>{currentEmojis[0]}</button>
-            <button onClick={handleClick}>{currentEmojis[1]}</button>
-            <button onClick={handleClick}>{currentEmojis[2]}</button>
-          </div>
-
-          <EmojiLists
-            likedEmojis={likedEmojis}
-            passedEmojis={passedEmojis}
-            generateListItems={generateListItems}
+          <EmojiPicker
+            emojis={state.currentEmojis}
+            onPick={(emoji) => dispatch({ type: 'PICK_EMOJI', payload: emoji })}
+          />
+          <EmojiListPanel
+            likedTitle={activeTheme.uiText.likedListTitle}
+            passedTitle={activeTheme.uiText.passedListTitle}
+            likedEmojis={state.likedEmojis}
+            passedEmojis={state.passedEmojis}
+            renderListItem={renderEmojiListItem}
           />
         </>
       ) : (
-        // hydrated false olduğunda yükleniyor mesajını göster
-        <p>Emojiler yükleniyor...</p>
+        <p>{activeTheme.uiText.loadingLabel}</p>
       )}
     </div>
   )

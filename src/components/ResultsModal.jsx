@@ -1,31 +1,28 @@
+import ResultCard from './ResultCard'
+
 export default function ResultsModal(props) {
   const message = !props.resultsReady ? (
     <div className='modal-inner-container'>
-      <img src='./images/gear.svg' /> <p>Sonuclarin Hesaplanmasi</p>{' '}
+      <img src='./images/gear.svg' alt='Yukleniyor' />
+      <p>{props.uiText.calculatingLabel}</p>
     </div>
   ) : (
-    <div className='modal-inner-container'>
-      <ul className='bounce-top'>
-        {props.likedEmojis.map(props.generateListItems)}
-      </ul>
-      <p>
-        Kisiligin: <span>{props.computedResult?.label || 'harika'}</span>
-      </p>
-      {props.computedResult?.mainText ? <p>{props.computedResult.mainText}</p> : null}
-      {props.computedResult?.subNote ? <p>{props.computedResult.subNote}</p> : null}
-      <button className='try-again-button' onClick={props.reset}>
-        Tekrar Deneyin
-      </button>
-    </div>
+    <ResultCard
+      result={props.computedResult}
+      onRetry={props.onReset}
+      retryLabel={props.uiText.retryButtonLabel}
+      fallbackTitle={props.uiText.fallbackResultTitle}
+      fallbackBody={props.uiText.fallbackResultBody}
+    />
   )
 
-  if (props.likedEmojis.length >= 10) {
+  if (props.likedEmojis.length >= props.maxSelection) {
     return (
       <div className='results-modal-container'>
         {!props.showResults ? (
           <div className='modal-inner-container'>
-            <button className='get-results-button' onClick={props.getResults}>
-              Sonuclara Ulasin
+            <button className='get-results-button' onClick={props.onShowResults}>
+              {props.uiText.showResultButtonLabel}
             </button>
           </div>
         ) : (
@@ -33,7 +30,7 @@ export default function ResultsModal(props) {
         )}
       </div>
     )
-  } else {
-    return null
   }
+
+  return null
 }

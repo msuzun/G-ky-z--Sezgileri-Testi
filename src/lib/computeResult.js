@@ -11,6 +11,37 @@ function seedPick(items, seedSource) {
   return items[seed % items.length]
 }
 
+function pickTextVariant(variants, fallback, seedSource) {
+  if (Array.isArray(variants) && variants.length > 0) {
+    return seedPick(variants, seedSource)
+  }
+  return fallback
+}
+
+function resolveProfileText(profile, selectionSeed) {
+  const baseBody = profile.body ?? profile.mainText ?? ''
+  const baseFootnote = profile.footnote ?? profile.subNote ?? ''
+
+  const body = pickTextVariant(
+    profile.bodyVariants,
+    baseBody,
+    `${selectionSeed}|${profile.id}|body`
+  )
+  const footnote = pickTextVariant(
+    profile.footnoteVariants,
+    baseFootnote,
+    `${selectionSeed}|${profile.id}|footnote`
+  )
+
+  return {
+    ...profile,
+    body,
+    footnote,
+    mainText: body,
+    subNote: footnote
+  }
+}
+
 export default function computeResult(selectedEmojis, theme) {
   const profiles = theme?.resultProfiles ?? []
   const rules = theme?.scoringRules ?? []
@@ -22,6 +53,7 @@ export default function computeResult(selectedEmojis, theme) {
   const scoreByProfile = {}
   const matchCountByProfile = {}
   const uniqueSelection = Array.from(new Set(selectedEmojis))
+  const selectionSeed = `${theme.id || 'theme'}|${uniqueSelection.slice().sort().join('')}`
 
   for (const profile of profiles) {
     scoreByProfile[profile.id] = 0
@@ -31,6 +63,9 @@ export default function computeResult(selectedEmojis, theme) {
   for (const emoji of uniqueSelection) {
     for (const rule of rules) {
       if (!rule.emojis.includes(emoji)) {
+        continue
+      }
+      if (!Object.prototype.hasOwnProperty.call(scoreByProfile, rule.profileId)) {
         continue
       }
 
@@ -52,21 +87,20 @@ export default function computeResult(selectedEmojis, theme) {
   const topByScore = ranked.filter((entry) => entry.score === highestScore)
 
   if (topByScore.length === 1 && highestScore > 0) {
-    return topByScore[0].profile
+    return resolveProfileText(topByScore[0].profile, selectionSeed)
   }
 
   const highestMatchCount = Math.max(...topByScore.map((entry) => entry.matches))
   const topByMatchCount = topByScore.filter((entry) => entry.matches === highestMatchCount)
 
   if (topByMatchCount.length === 1 && highestScore > 0) {
-    return topByMatchCount[0].profile
+    return resolveProfileText(topByMatchCount[0].profile, selectionSeed)
   }
 
-  const source = `${theme.id || 'theme'}|${uniqueSelection.slice().sort().join('')}`
   const finalists =
     highestScore > 0
       ? topByMatchCount.map((entry) => entry.profile)
       : profiles
 
-  return seedPick(finalists, source)
+  return resolveProfileText(seedPick(finalists, selectionSeed), selectionSeed)
 }
