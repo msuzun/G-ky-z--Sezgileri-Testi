@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Satellite">
+  <rect width="120" height="120" rx="18" fill="#10253f"/>
+  <rect x="48" y="50" width="24" height="20" rx="3" fill="#c7e1f6"/>
+  <rect x="22" y="52" width="22" height="16" fill="#6db3df"/>
+  <rect x="76" y="52" width="22" height="16" fill="#6db3df"/>
+  <line x1="60" y1="70" x2="76" y2="84" stroke="#d2e6f7" stroke-width="3"/>
+  <circle cx="80" cy="88" r="6" fill="#d2e6f7"/>
+</svg>

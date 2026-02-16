@@ -1,15 +1,24 @@
+import SoftThemeHeader from './SoftThemeHeader'
+import ReflectionQuoteCard from './ReflectionQuoteCard'
+import GentleReflectionNote from './GentleReflectionNote'
+
 export default function ResultCard({
   result,
   onRetry,
   retryLabel,
-  fallbackTitle,
-  fallbackBody
+  uiText
 }) {
+  const themeClassName = result?.theme?.backgroundClassName || 'reflection-bg-gozlem'
+
   return (
-    <div className='modal-inner-container'>
-      <h2 className='result-card-title'>{result?.title || fallbackTitle}</h2>
-      <p className='result-card-main'>{result?.mainText || fallbackBody}</p>
-      {result?.subNote ? <p className='result-card-note'>{result.subNote}</p> : null}
+    <div className={`modal-inner-container reflection-card ${themeClassName}`}>
+      <SoftThemeHeader theme={result?.theme} />
+      <ReflectionQuoteCard quote={result?.quote} label={uiText.quoteLabel} />
+      <GentleReflectionNote
+        label={uiText.reflectionLabel}
+        commonMessage={uiText.commonReflectionMessage}
+        reflectionText={result?.reflectionText || uiText.fallbackResultBody}
+      />
       <button className='try-again-button' onClick={onRetry}>
         {retryLabel}
       </button>

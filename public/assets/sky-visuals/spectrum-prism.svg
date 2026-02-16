@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Spectrum prism">
+  <rect width="120" height="120" rx="18" fill="#11253e"/>
+  <polygon points="56,36 78,78 34,78" fill="#ecf5ff" opacity="0.95"/>
+  <rect x="10" y="55" width="38" height="4" fill="#ffffff"/>
+  <rect x="79" y="56" width="30" height="3" fill="#f55b5b"/>
+  <rect x="79" y="61" width="30" height="3" fill="#f5ac3f"/>
+  <rect x="79" y="66" width="30" height="3" fill="#f4f071"/>
+  <rect x="79" y="71" width="30" height="3" fill="#69d1f5"/>
+</svg>

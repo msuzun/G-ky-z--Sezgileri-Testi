@@ -13,11 +13,13 @@ export default function EmojiListPanel({
         title={likedTitle}
         emojis={likedEmojis}
         renderListItem={renderListItem}
+        variant='liked'
       />
       <EmojiListSection
         title={passedTitle}
         emojis={passedEmojis}
         renderListItem={renderListItem}
+        variant='passed'
       />
     </div>
   )

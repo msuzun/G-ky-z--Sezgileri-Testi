@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Sakin Ufuk">
+  <rect width="120" height="120" rx="18" fill="#f9f0ff"/>
+  <path d="M12 78c14-6 28-7 46-4 19 3 34 2 50-4" fill="none" stroke="#cdaede" stroke-width="2"/>
+  <path d="M12 88c14-6 28-7 46-4 19 3 34 2 50-4" fill="none" stroke="#e0c7eb" stroke-width="2"/>
+  <circle cx="28" cy="34" r="4" fill="#cdaede"/>
+</svg>

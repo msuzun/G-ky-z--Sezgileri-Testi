@@ -3,26 +3,45 @@ import ResultsModal from './components/ResultsModal'
 import EmojiListPanel from './components/EmojiListPanel'
 import EmojiPicker from './components/EmojiPicker'
 import ProgressHeader from './components/ProgressHeader'
-import computeResult from './lib/computeResult'
+import computeReflection from './lib/computeReflection'
 import skyTheme from './themes/skyTheme'
 import { GAME_CONFIG } from './config/gameConfig'
 import './styles.css'
 
 const activeTheme = skyTheme
 
-function generateEmojiBatch(pool, batchSize) {
-  function pickRandomEmoji() {
-    return pool[Math.floor(Math.random() * pool.length)]
+function shuffleVisuals(pool) {
+  const shuffled = [...pool]
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    const temp = shuffled[i]
+    shuffled[i] = shuffled[j]
+    shuffled[j] = temp
+  }
+  return shuffled
+}
+
+function validateVisualPool(pool) {
+  const requiredCount = GAME_CONFIG.maxSelection * GAME_CONFIG.emojiBatchSize
+  const uniqueIds = new Set(pool.map((visual) => visual.id))
+
+  if (pool.length < requiredCount) {
+    throw new Error(`visualPool en az ${requiredCount} oge icermeli.`)
   }
 
-  return new Array(batchSize).fill('').map(() => pickRandomEmoji())
+  if (uniqueIds.size !== pool.length) {
+    throw new Error('visualPool icinde tekrar eden id var.')
+  }
 }
 
 function createInitialState(theme) {
+  validateVisualPool(theme.visualPool)
+  const shuffledVisuals = shuffleVisuals(theme.visualPool)
   return {
-    likedEmojis: [],
-    passedEmojis: [],
-    currentEmojis: generateEmojiBatch(theme.emojiPool, GAME_CONFIG.emojiBatchSize),
+    likedVisualIds: [],
+    passedVisualIds: [],
+    currentVisuals: shuffledVisuals.slice(0, GAME_CONFIG.emojiBatchSize),
+    remainingVisuals: shuffledVisuals.slice(GAME_CONFIG.emojiBatchSize),
     isResultsVisible: false,
     areResultsReady: false,
     isHydrated: false
@@ -32,15 +51,33 @@ function createInitialState(theme) {
 function gameReducer(state, action) {
   switch (action.type) {
     case 'PICK_EMOJI': {
-      const clickedEmoji = action.payload
-      const newLikedEmojis = [...state.likedEmojis, clickedEmoji]
-      const newPassedEmojis = state.currentEmojis.filter((emoji) => emoji !== clickedEmoji)
+      const clickedVisualId = action.payload
+      const newLikedVisualIds = [...state.likedVisualIds, clickedVisualId]
+      const newPassedVisualIds = state.currentVisuals
+        .filter((visual) => visual.id !== clickedVisualId)
+        .map((visual) => visual.id)
+      const isLastQuestion =
+        newLikedVisualIds.length >= GAME_CONFIG.maxSelection
+
+      if (isLastQuestion) {
+        return {
+          ...state,
+          likedVisualIds: newLikedVisualIds,
+          passedVisualIds: [...state.passedVisualIds, ...newPassedVisualIds],
+          currentVisuals: [],
+          remainingVisuals: []
+        }
+      }
+
+      const nextVisuals = state.remainingVisuals.slice(0, GAME_CONFIG.emojiBatchSize)
+      const nextRemainingVisuals = state.remainingVisuals.slice(GAME_CONFIG.emojiBatchSize)
 
       return {
         ...state,
-        likedEmojis: newLikedEmojis,
-        passedEmojis: [...state.passedEmojis, ...newPassedEmojis],
-        currentEmojis: generateEmojiBatch(activeTheme.emojiPool, GAME_CONFIG.emojiBatchSize)
+        likedVisualIds: newLikedVisualIds,
+        passedVisualIds: [...state.passedVisualIds, ...newPassedVisualIds],
+        currentVisuals: nextVisuals,
+        remainingVisuals: nextRemainingVisuals
       }
     }
     case 'SHOW_RESULTS':
@@ -88,12 +125,22 @@ export default function App() {
   }, [])
 
   const computedResult = useMemo(
-    () => computeResult(state.likedEmojis, activeTheme),
-    [state.likedEmojis]
+    () => computeReflection(state.likedVisualIds),
+    [state.likedVisualIds]
   )
 
-  function renderEmojiListItem(element, index) {
-    return <li key={`${element}-${index}`}>{element}</li>
+  const visualById = useMemo(
+    () =>
+      activeTheme.visualPool.reduce((acc, visual) => {
+        acc[visual.id] = visual
+        return acc
+      }, {}),
+    []
+  )
+
+  function renderVisualListItem(element, index) {
+    const visual = visualById[element]
+    return <li key={`${element}-${index}`}>{visual?.label || element}</li>
   }
 
   return (
@@ -103,12 +150,12 @@ export default function App() {
       <ProgressHeader
         title={activeTheme.uiText.title}
         subtitle={activeTheme.uiText.subtitle}
-        progress={state.likedEmojis.length}
+        progress={state.likedVisualIds.length}
         total={GAME_CONFIG.maxSelection}
       />
 
       <ResultsModal
-        likedEmojis={state.likedEmojis}
+        likedEmojis={state.likedVisualIds}
         maxSelection={GAME_CONFIG.maxSelection}
         showResults={state.isResultsVisible}
         resultsReady={state.areResultsReady}
@@ -121,15 +168,16 @@ export default function App() {
       {state.isHydrated ? (
         <>
           <EmojiPicker
-            emojis={state.currentEmojis}
-            onPick={(emoji) => dispatch({ type: 'PICK_EMOJI', payload: emoji })}
+            visuals={state.currentVisuals}
+            selectedIds={state.likedVisualIds}
+            onPick={(visualId) => dispatch({ type: 'PICK_EMOJI', payload: visualId })}
           />
           <EmojiListPanel
             likedTitle={activeTheme.uiText.likedListTitle}
             passedTitle={activeTheme.uiText.passedListTitle}
-            likedEmojis={state.likedEmojis}
-            passedEmojis={state.passedEmojis}
-            renderListItem={renderEmojiListItem}
+            likedEmojis={state.likedVisualIds}
+            passedEmojis={state.passedVisualIds}
+            renderListItem={renderVisualListItem}
           />
         </>
       ) : (

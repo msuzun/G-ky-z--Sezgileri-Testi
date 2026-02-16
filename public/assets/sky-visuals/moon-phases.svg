@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Moon phases">
+  <rect width="120" height="120" rx="18" fill="#1a2440"/>
+  <circle cx="24" cy="60" r="10" fill="#f4ead9"/>
+  <circle cx="48" cy="60" r="10" fill="#f4ead9"/>
+  <circle cx="52" cy="60" r="10" fill="#1a2440"/>
+  <circle cx="72" cy="60" r="10" fill="#f4ead9"/>
+  <circle cx="92" cy="60" r="10" fill="#f4ead9"/>
+  <circle cx="88" cy="60" r="10" fill="#1a2440"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Telescope">
+  <rect width="120" height="120" rx="18" fill="#0f2940"/>
+  <rect x="20" y="44" width="62" height="14" rx="6" transform="rotate(-18 20 44)" fill="#74b6e6"/>
+  <circle cx="83" cy="44" r="9" fill="#d8ecff"/>
+  <rect x="58" y="55" width="5" height="35" fill="#95c9ec"/>
+  <rect x="42" y="90" width="37" height="6" rx="3" fill="#95c9ec"/>
+</svg>

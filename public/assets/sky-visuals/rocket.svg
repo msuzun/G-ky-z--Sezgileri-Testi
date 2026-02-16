@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Rocket">
+  <rect width="120" height="120" rx="18" fill="#10243d"/>
+  <path d="M62 24c15 10 17 34 2 50L54 84 42 72 52 62c16-15 2-39 10-38z" fill="#d9ecff"/>
+  <circle cx="57" cy="48" r="5" fill="#5ba7d8"/>
+  <path d="M40 76l-8 16 16-8z" fill="#6db8e5"/>
+  <path d="M64 84l14 14-4-18z" fill="#6db8e5"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Planet">
+  <rect width="120" height="120" rx="18" fill="#132a44"/>
+  <circle cx="58" cy="60" r="24" fill="#8ab8df"/>
+  <ellipse cx="58" cy="60" rx="38" ry="10" fill="none" stroke="#d9ebf8" stroke-width="4"/>
+  <circle cx="44" cy="54" r="4" fill="#6f9fc6"/>
+  <circle cx="68" cy="67" r="5" fill="#6f9fc6"/>
+</svg>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="İnce Harita">
+  <rect width="120" height="120" rx="18" fill="#f9f0ff"/>
+  <circle cx="28" cy="34" r="2.4" fill="#c7a8dc"/>
+  <circle cx="76" cy="28" r="2.4" fill="#c7a8dc"/>
+  <circle cx="92" cy="64" r="2.4" fill="#c7a8dc"/>
+  <circle cx="56" cy="72" r="2.4" fill="#c7a8dc"/>
+  <circle cx="24" cy="86" r="2.4" fill="#c7a8dc"/>
+  <path d="M28 34 76 28 92 64 56 72 24 86" fill="none" stroke="#c7a8dc" stroke-width="1.8"/>
+</svg>

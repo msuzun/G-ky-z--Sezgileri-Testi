@@ -11,8 +11,7 @@ export default function ResultsModal(props) {
       result={props.computedResult}
       onRetry={props.onReset}
       retryLabel={props.uiText.retryButtonLabel}
-      fallbackTitle={props.uiText.fallbackResultTitle}
-      fallbackBody={props.uiText.fallbackResultBody}
+      uiText={props.uiText}
     />
   )
 

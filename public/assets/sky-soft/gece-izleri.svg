@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Gece İzleri">
+  <rect width="120" height="120" rx="18" fill="#f6ecff"/>
+  <path d="M26 86c18-8 34-24 48-52" fill="none" stroke="#c6a2dc" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M40 90c18-8 30-20 42-42" fill="none" stroke="#debedf" stroke-width="1.8" stroke-linecap="round"/>
+  <circle cx="78" cy="30" r="3" fill="#c6a2dc"/>
+</svg>

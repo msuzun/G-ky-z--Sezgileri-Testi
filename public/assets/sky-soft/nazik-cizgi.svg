@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Nazik Çizgi">
+  <rect width="120" height="120" rx="18" fill="#fbf2ff"/>
+  <path d="M20 74c11-9 22-12 36-10 17 2 24 1 44-8" fill="none" stroke="#cfb0e4" stroke-width="2" stroke-linecap="round"/>
+  <path d="M20 54c11-9 22-12 36-10 17 2 24 1 44-8" fill="none" stroke="#dfc7ef" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="34" cy="40" r="2.4" fill="#cfb0e4"/>
+</svg>
